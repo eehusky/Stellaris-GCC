@@ -4,7 +4,7 @@ TIStellarisBuild
 Scripts to Build TI Stellaris ARM Toolchain, Libraries, and Programs using GCC.
 
 ##How-To:
-1. Download and build the Summon Arm Toolchaing from [here][sat]
+1. Download and build the Summon Arm Toolchain from [here][sat]
 2. Download and build lm4flash tools from [here][lm4]
 3. Download and extract the Stellaris Ware package from [here][sw]
 
@@ -13,7 +13,7 @@ Scripts to Build TI Stellaris ARM Toolchain, Libraries, and Programs using GCC.
 
     TOOL        = /mnt/raidarray/share/workspace/sat/
 
-6. Change the following line to point to the root of the Stellarisware directory.
+6. Change the following line to point to the root of the Stellaris Ware directory.
 
     SW_DIR      = /mnt/raidarray/share/workspace/embedded/stellaris/sw/
 
