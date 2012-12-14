@@ -1,3 +1,5 @@
+_stack_size = 4K;
+
 MEMORY
 {
     FLASH (rx) : ORIGIN = 0x00000000, LENGTH = 256K
@@ -23,7 +25,7 @@ SECTIONS
         _edata = .;
     } > SRAM
 
-    .bss :
+    .bss : AT(ADDR(.data) + SIZEOF(.data))
     {
         _bss = .;
         *(.bss*)
@@ -31,10 +33,10 @@ SECTIONS
         _ebss = .;
     } > SRAM
 
-    . = ALIGN(32);           /*Not sure if this needs to be done, but why not.*/
-    _stack_bottom = .;       /*Address of the bottom of the stack.*/
-    . = . + 0x1000;          /*Allocate 4K for the Stack.*/
-    _stack_top = .;          /*Address of the top of the stack.*/
-    _heap_bottom = .;        /*Address of the bottom of the heap.*/
-    _heap_top = 0x20008000;  /*Address of the top of the heap, also end of RAM.*/
+    _heap_bottom = .;
+    _heap_top = ORIGIN(SRAM) + LENGTH(SRAM) - _stack_size;
+
+    _stack_bottom = _heap_top;
+    _stack_top = ORIGIN(SRAM) + LENGTH(SRAM);
+
 }

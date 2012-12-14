@@ -1,10 +1,9 @@
-// Forward declaration of the default fault handlers.
+#include "stellariscommon.h"
+
 void ResetISR(void);
 static void NmiSR(void);
 static void FaultISR(void);
 static void IntDefaultHandler(void);
-
-// The entry point for the application.
 extern int main(void);
 
 // Symbols Created by the Linker
@@ -18,11 +17,9 @@ extern unsigned long _stack_top;
 extern unsigned long _heap_bottom;
 extern unsigned long _heap_top;
 
-// The vector table.  Note that the proper constructs must be placed on this to
-// ensure that it ends up at physical address 0x0000.0000.
 __attribute__ ((section(".isr_vector")))void (* const g_pfnVectors[])(void) =
 {
-    0,                                      // StackPtr, set in RestetISR
+    (void (*)(void))((unsigned long) &_stack_top),
     ResetISR,                               // The reset handler
     NmiSR,                                  // The NMI handler
     FaultISR,                               // The hard fault handler
@@ -179,18 +176,24 @@ __attribute__ ((section(".isr_vector")))void (* const g_pfnVectors[])(void) =
     IntDefaultHandler                       // PWM 1 Fault
 };
 
+void HardwareInit()
+{
+    SetupFPU();
+    SetupClock (CLK80);
+    SetupStdio();
+
+    main();
+}
+
 void ResetISR(void)
 {
     unsigned long *pulSrc, *pulDest;
 
-    // Copy the data segment initializers from flash to SRAM.
+    //Copy the data segment initializers from flash to SRAM.
     pulSrc = &_etext;
     for(pulDest = &_data; pulDest < &_edata; ){
         *pulDest++ = *pulSrc++;
     }
-
-    //Load the Stack Pointer
-    __asm("    ldr     sp, = _stack_top\n");
 
     // Zero fill the bss segment.
     __asm("    ldr     r0, =_bss\n"
@@ -203,8 +206,7 @@ void ResetISR(void)
           "        strlt   r2, [r0], #4\n"
           "        blt     zero_loop");
 
-    // Call the application's entry point.
-    main();
+    HardwareInit();
 }
 
 static void NmiSR(void)

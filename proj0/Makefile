@@ -4,34 +4,34 @@ TARGET      = proj0
 
 # List all the source files here
 SOURCES    += proj0.c
-SOURCES    += StellarisCommon.c
+SOURCES    += stellariscommon.c
 SOURCES    += startup.c
 SOURCES    += syscalls.c
 
 #SOURCES  = $(wildcard src/*.c)
 
-# Include are located in the Include directory
-INCLUDES    = -Isrc/include -Isrc -I$(TOOL)/arm-nono-eabi/include
+# Includes are located in the Include directory
+INCLUDES    = -Isrc/include
 
 # Path to the root of your ARM toolchain
-TOOL        = /mnt/raidarray/share/workspace/sat/
+TOOL        = ../../../sat/
 
 # Path to the root of your StellarisWare folder
-SW_DIR      = /mnt/raidarray/share/workspace/embedded/stellaris/sw/
+SW_DIR      = ../StellarisWare/
 
 # Location of a loader script, doesnt matter which one, they're the same
-LD_SCRIPT   = stellarisloader.ld
+LD_SCRIPT   = lm4f120h5qr.ld
 
 # Object File Directory, keeps things tidy
 OBJECTS     = $(patsubst %.o, .obj/%.o,$(SOURCES:.c=.o))
+ASMS        = $(patsubst %.s, .obj/%.s,$(SOURCES:.c=.s))
 
 # FPU Type
 #FPU         = hard
 FPU         = softfp
 
-# Comment the last one to enable verbose mode
-VERBOSE     = 1
-VERBOSE     =
+# Remove # to enable verbose
+VERBOSE     = #1
 
 
 # Flag Definitions
@@ -102,24 +102,37 @@ MKDIR       = mkdir -p
 ###############################################################################
 all: dirs bin/$(TARGET).bin size
 
+asm: $(ASMS)
+
 # Compiler Command
 .obj/%.o: src/%.c
 	@if [ 'x${VERBOSE}' = x ];                                                \
 	 then                                                                     \
-	     echo "  CC         ${<}";                                            \
+	     echo "CC           ${<}";                                            \
 	 else                                                                     \
 	     echo $(CC) -c $(CFLAGS) -o $@ $<;                                    \
 	 fi
 	@$(MKDIR) $(dir $@)
 	@$(CC) -c $(CFLAGS) -o $@ $<
 
+# Create Assembly
+.obj/%.s: src/%.c
+	@if [ 'x${VERBOSE}' = x ];                                                \
+	 then                                                                     \
+	     echo "CC -S        ${<}";                                            \
+	 else                                                                     \
+	     echo $(CC) -S -c $(CFLAGS) -o $@ $<;                                 \
+	 fi
+	@$(MKDIR) $(dir $@)
+	@$(CC) -S -c $(CFLAGS) -o $@ $<
+
 # Linker Command
 .obj/$(TARGET).out: $(OBJECTS)
 	@if [ 'x${VERBOSE}' = x ];                                                \
 	 then                                                                     \
-	     echo "  LD         $@";                                              \
+	     echo "LD           $@";                                              \
 	 else                                                                     \
-	     echo $(LD) -T stellarisloader.ld $(LDFLAGS) -o $@ $(OBJECTS) $(LIBS);\
+	     echo $(LD) $(LDFLAGS) -o $@ $(OBJECTS) $(LIBS);\
 	 fi
 	@$(LD) $(LDFLAGS) -o $@ $(OBJECTS) $(LIBS);
 
@@ -127,16 +140,17 @@ all: dirs bin/$(TARGET).bin size
 bin/$(TARGET).bin: .obj/$(TARGET).out
 	@if [ 'x${VERBOSE}' = x ];                                                \
 	 then                                                                     \
-	     echo "  OBJCOPY    ${<} $@";                                         \
+	     echo "OBJCOPY      ${<} $@";                                         \
 	 else                                                                     \
 	     echo $(OBJCOPY) -O binary .obj/$(TARGET).out bin/$(TARGET).bin;      \
 	 fi
 	@$(OBJCOPY) -O binary .obj/$(TARGET).out bin/$(TARGET).bin
 
+# Calculate the Size of the Image
 size: .obj/$(TARGET).out
 	@if [ 'x${VERBOSE}' = x ];                                                \
 	 then                                                                     \
-	     echo "  SIZE    ${<}";                                               \
+	     echo "SIZE      ${<}";                                               \
 	 else                                                                     \
 	     echo $(SIZE) $<;                                                     \
 	 fi

@@ -1,6 +1,8 @@
 #ifndef _STELLARIS_COMMON_H_
 #define _STELLARIS_COMMON_H_
 
+#include <stdio.h>
+
 #define TRACE    printf("TRACE %s:%d: %s\n",__FILE__,__LINE__,__FUNCTION__)
 #define VAL_I(x) printf(#x ": %d\n", x);
 #define VAL_X(x) printf(#x ": 0x%X\n", (unsigned int)x);
