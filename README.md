@@ -11,17 +11,17 @@ Scripts to Build TI Stellaris ARM Toolchain, Libraries, and Programs using GCC.
 4. Clone this repo
 5. Change line 17 of the Makefile to point to the root of your Summon Arm Toolchain directory (note: root, not bin/)
 
-    TOOL        = /mnt/raidarray/share/workspace/sat/
+    TOOL        = ../../../sat/
 
 6. Change the following line to point to the root of the Stellaris Ware directory.
 
-    SW_DIR      = /mnt/raidarray/share/workspace/embedded/stellaris/sw/
+    SW_DIR      = ../StellarisWare/
 
 7. I moved the lm4flash binaries to the bin directory of the gcc toolchain so `$(TOOL)/bin/lm4flash` simply to keep everything in the same spot.  If you dont want to, youll need to change the path on line 93.
 
     FLASH       = $(TOOL)/bin/lm4flash
 
-8. Assuming everything went alright, you should be able to `cd proj0 && make && make install` to flash the provided progrom to the board.
+8. Assuming everything went alright, you should be able to `cd proj0 && make && make install` to flash the provided program to the board.
 
 
 
